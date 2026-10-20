@@ -2,13 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { createServerSupabaseClient } from "@/lib/supabase";
 import { estimateInstructorEarnings } from "@learnhub/shared";
-
-function assertAdmin(request: NextRequest) {
-  return request.cookies.get("learnhub_role")?.value === "admin";
-}
+import { isAdminRequest } from "@/lib/admin-auth";
 
 export async function GET(request: NextRequest) {
-  if (!assertAdmin(request)) {
+  if (!(await isAdminRequest(request))) {
     return NextResponse.json({ ok: false, error: "Admin access required." }, { status: 403 });
   }
 

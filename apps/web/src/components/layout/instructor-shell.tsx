@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { BarChart2, BookOpen, Home, PlusCircle, User } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { LogoutButton } from "@/components/layout/logout-button";
+import { SiteFooter } from "@/components/layout/site-footer";
 
 const navItems = [
   { href: "/instructor", label: "Dashboard", icon: Home },
@@ -29,6 +31,7 @@ export function InstructorShell({ children }: { children: React.ReactNode }) {
           <Link href="/instructor/courses/new" className="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground">
             + New
           </Link>
+          <LogoutButton />
         </div>
       </header>
 
@@ -56,6 +59,9 @@ export function InstructorShell({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
           </nav>
+          <div className="px-3 pt-4">
+            <LogoutButton className="w-full justify-start" />
+          </div>
         </aside>
 
         <main className="flex-1 pb-20 md:pb-0">{children}</main>
@@ -82,6 +88,9 @@ export function InstructorShell({ children }: { children: React.ReactNode }) {
           })}
         </div>
       </nav>
+      <div className="pb-16 md:pb-0">
+        <SiteFooter />
+      </div>
     </div>
   );
 }

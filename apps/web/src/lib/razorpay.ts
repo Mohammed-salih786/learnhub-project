@@ -14,7 +14,6 @@ import crypto from "crypto";
 
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID ?? "";
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET ?? "";
-const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET ?? "";
 const RAZORPAY_BASE_URL = "https://api.razorpay.com/v1";
 
 function razorpayAuth() {
@@ -85,7 +84,10 @@ export function verifyPaymentSignature(opts: {
     .createHmac("sha256", RAZORPAY_KEY_SECRET)
     .update(message)
     .digest("hex");
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(opts.signature));
+  const expectedBuffer = Buffer.from(expected, "hex");
+  const signatureBuffer = Buffer.from(opts.signature, "hex");
+  return signatureBuffer.length === expectedBuffer.length &&
+    crypto.timingSafeEqual(expectedBuffer, signatureBuffer);
 }
 
 /**
@@ -93,12 +95,16 @@ export function verifyPaymentSignature(opts: {
  * Raw body signed with webhook_secret.
  */
 export function verifyWebhookSignature(rawBody: string, signature: string): boolean {
-  if (!RAZORPAY_WEBHOOK_SECRET) return true; // Local dev: skip verification
+  const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET ?? "";
+  if (!webhookSecret) return process.env.NODE_ENV !== "production";
   const expected = crypto
-    .createHmac("sha256", RAZORPAY_WEBHOOK_SECRET)
+    .createHmac("sha256", webhookSecret)
     .update(rawBody)
     .digest("hex");
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  const expectedBuffer = Buffer.from(expected, "hex");
+  const signatureBuffer = Buffer.from(signature, "hex");
+  return signatureBuffer.length === expectedBuffer.length &&
+    crypto.timingSafeEqual(expectedBuffer, signatureBuffer);
 }
 
 // ---------------------------------------------------------------------------

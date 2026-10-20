@@ -6,13 +6,13 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { Input } from "@/components/ui/input";
 import { validateLoginAttempt } from "@/lib/auth";
 
 const methodOptions = [
   { value: "phone-otp", label: "Phone OTP" },
-  { value: "email-otp", label: "Email OTP" },
-  { value: "google", label: "Google" }
+  { value: "email-otp", label: "Email OTP" }
 ] as const;
 
 const roleOptions = [
@@ -26,7 +26,7 @@ export default function LoginPage() {
   const [nextRoute, setNextRoute] = useState<Route>("/student");
   const [method, setMethod] = useState<(typeof methodOptions)[number]["value"]>("phone-otp");
   const [role, setRole] = useState<(typeof roleOptions)[number]["value"]>("student");
-  const [formState, setFormState] = useState({ phone: "", email: "", fullName: "" });
+  const [formState, setFormState] = useState({ phone: "", email: "" });
   const [otp, setOtp] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isOtpSent, setIsOtpSent] = useState(false);
@@ -43,12 +43,7 @@ export default function LoginPage() {
     const credentials =
       method === "phone-otp"
         ? { phone: formState.phone }
-        : method === "email-otp"
-          ? { email: formState.email }
-          : {
-              ...(formState.email ? { email: formState.email } : {}),
-              ...(formState.fullName ? { fullName: formState.fullName } : {})
-            };
+        : { email: formState.email };
 
     return validateLoginAttempt({ method, ...credentials, role });
   };
@@ -104,8 +99,9 @@ export default function LoginPage() {
         throw new Error(data.error ?? "Invalid OTP verification.");
       }
 
+      const authenticatedRole = data.user.role as (typeof roleOptions)[number]["value"];
       const requestedRoute = String(nextRoute);
-      const rolePrefix = `/${role}`;
+      const rolePrefix = `/${authenticatedRole}`;
       const protectedPrefixes = ["/student", "/instructor", "/admin"];
       const requestedProtectedRoute = protectedPrefixes.some(
         (prefix) => requestedRoute === prefix || requestedRoute.startsWith(`${prefix}/`)
@@ -124,7 +120,8 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
+    <div className="flex min-h-screen flex-col bg-background">
+      <main className="flex flex-1 items-center justify-center px-4 py-10">
       <Card className="w-full max-w-md p-6 shadow-soft">
         <div className="mb-6">
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">LearnHub</p>
@@ -183,23 +180,6 @@ export default function LoginPage() {
             />
           ) : null}
 
-          {method === "google" ? (
-            <>
-              <Input
-                type="email"
-                placeholder="Email address"
-                value={formState.email}
-                onChange={(event) => setFormState((current) => ({ ...current, email: event.target.value }))}
-              />
-              <Input
-                type="text"
-                placeholder="Full name"
-                value={formState.fullName}
-                onChange={(event) => setFormState((current) => ({ ...current, fullName: event.target.value }))}
-              />
-            </>
-          ) : null}
-
           {isOtpSent ? (
             <Input
               type="text"
@@ -219,7 +199,7 @@ export default function LoginPage() {
 
           {!isOtpSent ? (
             <Button className="w-full" type="submit" disabled={isLoading}>
-              {isLoading ? "Sending..." : method === "google" ? "Continue with Google" : "Send OTP"}
+              {isLoading ? "Sending..." : "Send OTP"}
             </Button>
           ) : (
             <Button className="w-full" type="button" onClick={verifyOtp} disabled={isLoading || otp.length < 4}>
@@ -228,6 +208,8 @@ export default function LoginPage() {
           )}
         </form>
       </Card>
-    </main>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

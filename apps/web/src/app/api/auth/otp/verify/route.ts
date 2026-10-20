@@ -5,7 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase";
 
 const verifySchema = z
   .object({
-    method: z.enum(["phone-otp", "email-otp", "google"]),
+    method: z.enum(["phone-otp", "email-otp"]),
     phone: z.string().min(10).max(25).optional(),
     email: z.string().email().optional(),
     fullName: z.string().min(2).max(120).optional(),
@@ -34,13 +34,16 @@ export async function POST(request: Request) {
 
   const { method, phone, email, fullName, code, role } = parsed.data;
   const supabase = createServerSupabaseClient();
-  const isLocalDev = process.env.NEXT_PUBLIC_SUPABASE_URL?.includes("localhost");
+  const isLocalDev =
+    process.env.NODE_ENV !== "production" &&
+    process.env.NEXT_PUBLIC_SUPABASE_URL?.includes("localhost") === true;
 
   try {
     let userId: string | null = null;
     let userEmail: string | null = email ?? null;
     let userPhone: string | null = phone ?? null;
     let sessionToken: string | null = null;
+    let finalRole: "student" | "instructor" | "admin" = role ?? "student";
 
     if (isLocalDev) {
       // In local dev, accept the demo OTP "123456"
@@ -81,17 +84,21 @@ export async function POST(request: Request) {
       }
 
       // Upsert profile
-      const { data: existingProfile } = await supabase
+      const { data: existingProfile, error: profileLookupError } = await supabase
         .from("profiles")
-        .select("id, role")
+        .select("id, role, email")
         .eq("id", userId!)
         .single();
+      if (profileLookupError && profileLookupError.code !== "PGRST116") throw profileLookupError;
+
+      if (!userEmail && existingProfile?.email) userEmail = existingProfile.email;
 
       const chosenRole = role ?? "student";
+      finalRole = existingProfile?.role ?? chosenRole;
 
       if (!existingProfile) {
         // First login — create profile and start trial
-        await supabase.from("profiles").insert({
+        const { error: profileInsertError } = await supabase.from("profiles").insert({
           id: userId!,
           email: userEmail,
           phone: userPhone,
@@ -101,6 +108,7 @@ export async function POST(request: Request) {
           trial_ends_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
           free_course_count: 0
         });
+        if (profileInsertError) throw profileInsertError;
 
         // Create trial subscription record
         const { data: trialPlan } = await supabase
@@ -121,17 +129,24 @@ export async function POST(request: Request) {
 
         // Create instructor profile if needed
         if (chosenRole === "instructor") {
-          await supabase.from("instructor_profiles").insert({
+          const { error: instructorProfileError } = await supabase.from("instructor_profiles").insert({
             user_id: userId!,
             bio: null,
             headline: null,
             verified_badge: false
           });
+          if (instructorProfileError) throw instructorProfileError;
         }
       }
     }
 
-    const finalRole = role ?? "student";
+    if ((role === "admin" || finalRole === "admin") && process.env.NODE_ENV === "production") {
+      const allowedAdminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+      if (!allowedAdminEmail || userEmail?.trim().toLowerCase() !== allowedAdminEmail) {
+        return NextResponse.json({ ok: false, error: "Admin access is restricted." }, { status: 403 });
+      }
+    }
+
     const response = NextResponse.json({
       ok: true,
       user: {

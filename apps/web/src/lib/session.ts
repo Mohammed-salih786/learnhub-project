@@ -16,8 +16,9 @@
 import { NextRequest } from "next/server";
 import { createServerSupabaseClient } from "./supabase";
 
-const JWT_SECRET = process.env.SUPABASE_JWT_SECRET ?? "";
-const IS_LOCAL_DEV = !process.env.NEXT_PUBLIC_SUPABASE_URL?.includes("supabase.co");
+const IS_LOCAL_DEV =
+  process.env.NODE_ENV !== "production" &&
+  process.env.NEXT_PUBLIC_SUPABASE_URL?.includes("localhost") === true;
 
 interface SessionInfo {
   userId: string;

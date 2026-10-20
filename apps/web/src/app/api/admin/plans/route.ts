@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { createServerSupabaseClient } from "@/lib/supabase";
-
-function assertAdmin(request: NextRequest) {
-  return request.cookies.get("learnhub_role")?.value === "admin";
-}
+import { getAdminUser, isAdminRequest } from "@/lib/admin-auth";
 
 const updatePlanSchema = z.object({
   id: z.string().uuid(),
@@ -16,7 +13,7 @@ const updatePlanSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
-  if (!assertAdmin(request)) {
+  if (!(await isAdminRequest(request))) {
     return NextResponse.json({ ok: false, error: "Admin access required." }, { status: 403 });
   }
 
@@ -31,7 +28,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  if (!assertAdmin(request)) {
+  const admin = await getAdminUser(request);
+  if (!admin) {
     return NextResponse.json({ ok: false, error: "Admin access required." }, { status: 403 });
   }
 
@@ -47,7 +45,7 @@ export async function PATCH(request: NextRequest) {
 
   const { id, ...updates } = parsed.data;
   const db = createServerSupabaseClient();
-  const adminId = request.cookies.get("learnhub_session")?.value;
+  const adminId = admin.id;
 
   const dbUpdates: Record<string, unknown> = {};
   if (updates.label !== undefined) dbUpdates.label = updates.label;

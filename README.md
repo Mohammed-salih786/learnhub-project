@@ -43,6 +43,29 @@ pnpm dev
 
 `pnpm dev` starts both apps. Use `pnpm dev:learnhub` or `pnpm dev:swachh` to run only one. Check `/api/health` on each port to verify its database connection; health checks return HTTP 503 if the database/schema is unavailable.
 
+## Deploy to Vercel
+
+This workspace contains two separate Next.js apps. Create a separate Vercel project for each app from the same Git repository:
+
+- LearnHub: set **Root Directory** to `apps/web`.
+- Swachh-Ayush: set **Root Directory** to `apps/swachh-ayush`.
+
+For LearnHub, enable **Include source files outside of the Root Directory in the Build Step** because it imports the shared workspace package from `packages/shared`. Vercel documents this requirement for monorepos that share source outside an app's root directory ([Vercel monorepo FAQ](https://vercel.com/docs/monorepos/monorepo-faq#can-i-share-source-files-between-projects-are-shared-packages-supported)).
+
+For LearnHub, create a hosted Supabase project, apply the SQL files in `supabase/migrations/` in order, and configure these Vercel environment variables for Production (and Preview if needed):
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` (server-side only; never add the `NEXT_PUBLIC_` prefix)
+- `ADMIN_EMAIL` (the verified email address allowed to use the admin role)
+- `NEXT_PUBLIC_APP_URL` (the deployed LearnHub URL, such as `https://your-app.vercel.app`)
+
+To enable paid subscriptions, also set live Razorpay values for `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`, `RAZORPAY_MONTHLY_PLAN_ID`, and `RAZORPAY_YEARLY_PLAN_ID`, then point the Razorpay webhook to `https://your-app.vercel.app/api/webhooks/razorpay`. Configure the Supabase Auth email or SMS provider for the OTP methods you plan to offer. Google sign-in is not currently offered.
+
+For Swachh-Ayush, set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, and a long random `SWACHH_INGEST_API_KEY`. Add the production Supabase URL and keys, create staff users, and assign their roles as described above. Its overdue scan also needs an external scheduler to call `/api/ops/scan-overdue` at least once per minute.
+
+Do not copy either local `.env.local` file into Vercel. Use the hosted Supabase URL and production credentials in Vercel's Environment Variables. Vercel supplies `NODE_ENV`; do not set it manually.
+
 Swachh-Ayush ingests only aggregate health counts and weather observations. Its telemetry, health, weather, and overdue-scan endpoints require `Authorization: Bearer <SWACHH_INGEST_API_KEY>`. Schedule `POST /api/ops/scan-overdue` with a trusted scheduler at least once per minute to detect stops that passed their collection time; a running app alone does not provide a background scheduler. Route planning currently uses a nearest-neighbour baseline with straight-line distances, not live road-network optimization. Critical-risk actions are written to the database as scheduled work items; connecting them to live truck dispatch, fogging systems, hospital feeds, Vertex AI, and a traffic-aware maps provider still requires those municipal integrations and credentials.
 
 To stop local Supabase, run `npx supabase stop`.

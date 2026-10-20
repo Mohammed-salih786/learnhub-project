@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { createServerSupabaseClient } from "@/lib/supabase";
-
-function assertAdmin(request: NextRequest) {
-  return request.cookies.get("learnhub_role")?.value === "admin";
-}
+import { getAdminUser } from "@/lib/admin-auth";
 
 const resolveSchema = z.object({
   action: z.enum(["approve", "reject"]),
@@ -16,7 +13,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  if (!assertAdmin(request)) {
+  const admin = await getAdminUser(request);
+  if (!admin) {
     return NextResponse.json({ ok: false, error: "Admin access required." }, { status: 403 });
   }
 
@@ -31,7 +29,7 @@ export async function POST(
   }
 
   const { action } = parsed.data;
-  const adminId = request.cookies.get("learnhub_session")?.value;
+  const adminId = admin.id;
   const db = createServerSupabaseClient();
 
   const { data: flag, error: flagError } = await db

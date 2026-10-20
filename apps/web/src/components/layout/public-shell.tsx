@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { LogoutButton } from "@/components/layout/logout-button";
+import { SiteFooter } from "@/components/layout/site-footer";
 
 const navLinks = [
   { href: "/student/courses", label: "Courses" },
@@ -15,9 +18,13 @@ const navLinks = [
 
 export function PublicShell({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+  const isAuthenticatedArea = ["/student", "/instructor", "/admin"].some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+  );
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border/80 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           {/* Logo */}
@@ -39,12 +46,18 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
 
           {/* Desktop CTAs */}
           <div className="hidden items-center gap-2 md:flex">
-            <Button variant="ghost" asChild size="sm">
-              <Link href="/login">Log in</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href="/login?role=student">Start free</Link>
-            </Button>
+            {isAuthenticatedArea ? (
+              <LogoutButton />
+            ) : (
+              <>
+                <Button variant="ghost" asChild size="sm">
+                  <Link href="/login">Log in</Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link href="/login?role=student">Start free</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile hamburger */}
@@ -77,18 +90,25 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
             <div className="mt-3 flex flex-col gap-2 pt-3 border-t border-border">
-              <Button variant="outline" asChild className="w-full">
-                <Link href="/login" onClick={() => setMobileOpen(false)}>Log in</Link>
-              </Button>
-              <Button asChild className="w-full">
-                <Link href="/login?role=student" onClick={() => setMobileOpen(false)}>Start free trial</Link>
-              </Button>
+              {isAuthenticatedArea ? (
+                <LogoutButton className="w-full" />
+              ) : (
+                <>
+                  <Button variant="outline" asChild className="w-full">
+                    <Link href="/login" onClick={() => setMobileOpen(false)}>Log in</Link>
+                  </Button>
+                  <Button asChild className="w-full">
+                    <Link href="/login?role=student" onClick={() => setMobileOpen(false)}>Start free trial</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </nav>
         </div>
       </header>
 
-      {children}
+      <div className="flex-1">{children}</div>
+      <SiteFooter />
     </div>
   );
 }
