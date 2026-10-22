@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { createServerSupabaseClient } from "@/lib/supabase";
+import { createAnonServerSupabaseClient } from "@/lib/supabase";
 
 
 const requestSchema = z
@@ -32,7 +32,6 @@ export async function POST(request: Request) {
   }
 
   const { method, phone, email } = parsed.data;
-  const supabase = createServerSupabaseClient();
   const isLocalDev =
     process.env.NODE_ENV !== "production" &&
     process.env.NEXT_PUBLIC_SUPABASE_URL?.includes("localhost") === true;
@@ -46,6 +45,7 @@ export async function POST(request: Request) {
         // Local dev: use messaging helper which returns demo code
         // Local demo OTP is returned in the response.
       } else {
+        const supabase = createAnonServerSupabaseClient();
         const { error } = await supabase.auth.signInWithOtp({ phone: normalizedPhone });
         if (error) throw error;
       }
@@ -64,6 +64,7 @@ export async function POST(request: Request) {
       if (isLocalDev) {
         // Local demo OTP is returned in the response.
       } else {
+        const supabase = createAnonServerSupabaseClient();
         const { error } = await supabase.auth.signInWithOtp({ email });
         if (error) throw error;
       }
@@ -80,7 +81,17 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: false, error: "Unsupported method." }, { status: 400 });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to send OTP.";
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    const details = err instanceof Error ? err.message : "";
+    const networkFailure = details.toLowerCase().includes("fetch failed");
+    const configurationFailure =
+      details.startsWith("Supabase configuration missing:") ||
+      details.startsWith("NEXT_PUBLIC_SUPABASE_URL");
+    const message = networkFailure
+      ? "Cannot reach Supabase Auth. Check the Supabase project URL and project availability."
+      : details || "Failed to send OTP.";
+    return NextResponse.json(
+      { ok: false, error: message },
+      { status: networkFailure || configurationFailure ? 503 : 500 }
+    );
   }
 }

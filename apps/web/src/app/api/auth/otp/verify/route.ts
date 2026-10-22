@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { createServerSupabaseClient } from "@/lib/supabase";
+import { createAnonServerSupabaseClient, createServerSupabaseClient } from "@/lib/supabase";
 
 const verifySchema = z
   .object({
@@ -33,7 +33,6 @@ export async function POST(request: Request) {
   }
 
   const { method, phone, email, fullName, code, role } = parsed.data;
-  const supabase = createServerSupabaseClient();
   const isLocalDev =
     process.env.NODE_ENV !== "production" &&
     process.env.NEXT_PUBLIC_SUPABASE_URL?.includes("localhost") === true;
@@ -53,13 +52,20 @@ export async function POST(request: Request) {
       userId = `demo-${Date.now()}`;
       sessionToken = `demo-session-${Date.now()}`;
     } else {
+      const authClient = createAnonServerSupabaseClient();
       if (method === "phone-otp" && phone) {
         const normalizedPhone = phone.startsWith("+") ? phone : `+91${phone.replace(/^0/, "")}`;
-        const { data, error } = await supabase.auth.verifyOtp({
+        const { data, error } = await authClient.auth.verifyOtp({
           phone: normalizedPhone,
           token: code,
           type: "sms"
         });
+        if (error?.message.toLowerCase().includes("fetch failed")) {
+          return NextResponse.json(
+            { ok: false, error: "Cannot reach Supabase Auth. Check the Supabase project URL and project availability." },
+            { status: 503 }
+          );
+        }
         if (error || !data.session) {
           return NextResponse.json({ ok: false, error: "Invalid or expired OTP." }, { status: 401 });
         }
@@ -68,11 +74,17 @@ export async function POST(request: Request) {
         userEmail = data.session.user.email ?? null;
         sessionToken = data.session.access_token;
       } else if (method === "email-otp" && email) {
-        const { data, error } = await supabase.auth.verifyOtp({
+        const { data, error } = await authClient.auth.verifyOtp({
           email,
           token: code,
           type: "email"
         });
+        if (error?.message.toLowerCase().includes("fetch failed")) {
+          return NextResponse.json(
+            { ok: false, error: "Cannot reach Supabase Auth. Check the Supabase project URL and project availability." },
+            { status: 503 }
+          );
+        }
         if (error || !data.session) {
           return NextResponse.json({ ok: false, error: "Invalid or expired OTP." }, { status: 401 });
         }
@@ -84,6 +96,7 @@ export async function POST(request: Request) {
       }
 
       // Upsert profile
+      const supabase = createServerSupabaseClient();
       const { data: existingProfile, error: profileLookupError } = await supabase
         .from("profiles")
         .select("id, role, email")
@@ -174,7 +187,17 @@ export async function POST(request: Request) {
 
     return response;
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Authentication failed.";
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    const details = err instanceof Error ? err.message : "";
+    const networkFailure = details.toLowerCase().includes("fetch failed");
+    const configurationFailure =
+      details.startsWith("Supabase configuration missing:") ||
+      details.startsWith("NEXT_PUBLIC_SUPABASE_URL");
+    const message = networkFailure
+      ? "Cannot reach Supabase. Check the project URL, credentials, and project availability."
+      : details || "Authentication failed.";
+    return NextResponse.json(
+      { ok: false, error: message },
+      { status: networkFailure || configurationFailure ? 503 : 500 }
+    );
   }
 }

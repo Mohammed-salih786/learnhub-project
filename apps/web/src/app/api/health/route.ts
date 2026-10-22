@@ -1,10 +1,26 @@
 import { NextResponse } from "next/server";
 
-import { createServerSupabaseClient } from "@/lib/supabase";
+import { createServerSupabaseClient, getMissingSupabaseEnvironment } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const missing = getMissingSupabaseEnvironment();
+  if (missing.length) {
+    return NextResponse.json(
+      {
+        ok: false,
+        service: "LearnHub",
+        status: "misconfigured",
+        database: "unchecked",
+        missingEnvironment: missing,
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV ?? "development",
+      },
+      { status: 503 },
+    );
+  }
+
   try {
     const db = createServerSupabaseClient();
     const { error } = await db.from("plans").select("id").limit(1);
