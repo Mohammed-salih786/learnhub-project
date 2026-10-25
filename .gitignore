@@ -10,6 +10,10 @@ dist
 .env
 .env.local
 .env.*.local
+.venv/
+__pycache__/
+*.py[cod]
+uploads/
 
 # OS
 .DS_Store

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -54,7 +54,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
                   <Link href="/login">Log in</Link>
                 </Button>
                 <Button asChild size="sm">
-                  <Link href="/login?role=student">Start free</Link>
+                  <Link href="/register">Start free</Link>
                 </Button>
               </>
             )}
@@ -98,7 +98,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
                     <Link href="/login" onClick={() => setMobileOpen(false)}>Log in</Link>
                   </Button>
                   <Button asChild className="w-full">
-                    <Link href="/login?role=student" onClick={() => setMobileOpen(false)}>Start free trial</Link>
+                    <Link href="/register" onClick={() => setMobileOpen(false)}>Start free trial</Link>
                   </Button>
                 </>
               )}

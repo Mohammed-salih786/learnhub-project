@@ -9,7 +9,6 @@
   "scripts": {
     "dev": "turbo run dev",
     "dev:learnhub": "turbo run dev --filter=web",
-    "dev:swachh": "turbo run dev --filter=swachh-ayush",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import Image from "next/image";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -80,7 +81,7 @@ export function ProfileEditor({ role }: { role: "student" | "instructor" }) {
       </div>
       <Card className="space-y-5 p-6">
         <div className="flex items-center gap-4">
-          {profile?.avatar_url ? <img src={profile.avatar_url} alt="Profile" className="h-14 w-14 rounded-full object-cover" /> : <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-xl font-black text-primary-foreground">{name[0]?.toUpperCase()}</div>}
+          {profile?.avatar_url ? <Image src={profile.avatar_url} alt="Profile" width={56} height={56} unoptimized className="h-14 w-14 rounded-full object-cover" /> : <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-xl font-black text-primary-foreground">{name[0]?.toUpperCase()}</div>}
           <div>
             <div className="flex items-center gap-2"><p className="font-semibold">{name}</p>{role === "instructor" && <Badge variant="secondary">Instructor</Badge>}</div>
             <p className="text-sm text-muted-foreground">{profile?.email ?? (loading ? "Loading profile…" : "Email not set")}</p>

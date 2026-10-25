@@ -1,19 +1,13 @@
 Hi team,
 
-Before we begin build work, please send every blocking item needed to launch LearnHub safely in India.
+Before launch, please share the following blocking items:
+- approved brand/domain and registrar access
+- legal entity and GST details for payment onboarding
+- MongoDB Atlas staging and production ownership
+- Flask and Next.js hosting access
+- Razorpay test/live keys and webhook approval, if payments are enabled
+- email sender and video provider credentials, if those features are enabled
+- monitoring project ownership and DNS records
+- refund policy and course moderation approvals
 
-Please share the following:
-- final brand/domain preference and registrar access
-- legal entity name and docs for Razorpay KYC
-- GST and tax setup details
-- preferred OTP provider (MSG91 or Twilio) and DLT registration status
-- email sending provider and sender domain approval
-- Supabase staging and production access
-- Vercel access and GitHub repo ownership
-- Bunny Stream API credentials and video workflow details
-- Razorpay test and live keys, webhook secret, and account approval status
-- PostHog and Sentry project ownership and access
-- DNS / domain records and production hosting ownership
-- refund policy and instructor content moderation approvals
-
-If something is not available yet, please tell us the owner, timeline, and cost. Once we have the complete list, we can continue with the next project phase.
+For each unavailable item, share its owner and expected date. Keep production secrets in the hosting secret manager; do not send them in email or commit them to the repository.

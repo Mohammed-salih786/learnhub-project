@@ -1,215 +1,37 @@
-"use client";
-
-import type { Route } from "next";
+﻿"use client";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { SiteFooter } from "@/components/layout/site-footer";
 import { Input } from "@/components/ui/input";
-import { validateLoginAttempt } from "@/lib/auth";
-
-const methodOptions = [
-  { value: "phone-otp", label: "Phone OTP" },
-  { value: "email-otp", label: "Email OTP" }
-] as const;
-
-const roleOptions = [
-  { value: "student", label: "Student" },
-  { value: "instructor", label: "Instructor" },
-  { value: "admin", label: "Admin" }
-] as const;
 
 export default function LoginPage() {
   const router = useRouter();
-  const [nextRoute, setNextRoute] = useState<Route>("/student");
-  const [method, setMethod] = useState<(typeof methodOptions)[number]["value"]>("phone-otp");
-  const [role, setRole] = useState<(typeof roleOptions)[number]["value"]>("student");
-  const [formState, setFormState] = useState({ phone: "", email: "" });
-  const [otp, setOtp] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isOtpSent, setIsOtpSent] = useState(false);
-  const [demoOtp, setDemoOtp] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const incomingRoute = params.get("next") ?? "/student";
-    setNextRoute(incomingRoute as Route);
-  }, []);
-
-  const getLoginPayload = () => {
-    const credentials =
-      method === "phone-otp"
-        ? { phone: formState.phone }
-        : { email: formState.email };
-
-    return validateLoginAttempt({ method, ...credentials, role });
-  };
-
-  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError(null);
-    setIsLoading(true);
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setLoading(true); setError("");
     try {
-      const payload = getLoginPayload();
-
-      const requestResponse = await fetch("/api/auth/otp/request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      const requestData = await requestResponse.json();
-      if (!requestResponse.ok || !requestData.ok) {
-        throw new Error(requestData.error ?? "Unable to send OTP.");
-      }
-
-      setIsOtpSent(true);
-      setDemoOtp(requestData.demoOtp ?? null);
-      setOtp("");
-    } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Validation failed.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const verifyOtp = async () => {
-    setError(null);
-    setIsLoading(true);
-
-    try {
-      const payload = getLoginPayload();
-
-      const response = await fetch("/api/auth/otp/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...payload,
-          code: otp,
-          role
-        })
-      });
-
-      const data = await response.json();
-      if (!response.ok || !data.ok) {
-        throw new Error(data.error ?? "Invalid OTP verification.");
-      }
-
-      const authenticatedRole = data.user.role as (typeof roleOptions)[number]["value"];
-      const requestedRoute = String(nextRoute);
-      const rolePrefix = `/${authenticatedRole}`;
-      const protectedPrefixes = ["/student", "/instructor", "/admin"];
-      const requestedProtectedRoute = protectedPrefixes.some(
-        (prefix) => requestedRoute === prefix || requestedRoute.startsWith(`${prefix}/`)
-      );
-      const destination =
-        requestedProtectedRoute && !(requestedRoute === rolePrefix || requestedRoute.startsWith(`${rolePrefix}/`))
-          ? (rolePrefix as Route)
-          : nextRoute;
-      router.push(destination);
-      router.refresh();
-    } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Verification failed.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <main className="flex flex-1 items-center justify-center px-4 py-10">
-      <Card className="w-full max-w-md p-6 shadow-soft">
-        <div className="mb-6">
-          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">LearnHub</p>
-          <h1 className="mt-2 text-3xl font-black">Welcome back</h1>
-        </div>
-
-        <div className="mb-5 flex gap-2 rounded-xl bg-muted p-1">
-          {methodOptions.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition ${
-                method === option.value ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-              }`}
-              onClick={() => setMethod(option.value)}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="mb-5">
-          <p className="mb-2 text-sm font-medium text-muted-foreground">Continue as</p>
-          <div className="grid grid-cols-3 gap-2">
-            {roleOptions.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
-                  role === option.value ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"
-                }`}
-                onClick={() => setRole(option.value)}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <form className="space-y-4" onSubmit={onSubmit}>
-          {method === "phone-otp" ? (
-            <Input
-              type="tel"
-              placeholder="Phone number"
-              value={formState.phone}
-              onChange={(event) => setFormState((current) => ({ ...current, phone: event.target.value }))}
-            />
-          ) : null}
-
-          {method === "email-otp" ? (
-            <Input
-              type="email"
-              placeholder="Email address"
-              value={formState.email}
-              onChange={(event) => setFormState((current) => ({ ...current, email: event.target.value }))}
-            />
-          ) : null}
-
-          {isOtpSent ? (
-            <Input
-              type="text"
-              inputMode="numeric"
-              placeholder="Enter OTP"
-              value={otp}
-              onChange={(event) => setOtp(event.target.value)}
-            />
-          ) : null}
-
-          {demoOtp ? (
-            <p className="text-sm text-muted-foreground">
-              Local development OTP: <span className="font-semibold text-foreground">{demoOtp}</span>
-            </p>
-          ) : null}
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
-
-          {!isOtpSent ? (
-            <Button className="w-full" type="submit" disabled={isLoading}>
-              {isLoading ? "Sending..." : "Send OTP"}
-            </Button>
-          ) : (
-            <Button className="w-full" type="button" onClick={verifyOtp} disabled={isLoading || otp.length < 4}>
-              {isLoading ? "Verifying..." : "Verify OTP"}
-            </Button>
-          )}
-        </form>
-      </Card>
-      </main>
-      <SiteFooter />
-    </div>
-  );
+      const response = await fetch("/api/auth/password/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.error || "Login failed.");
+      const next = new URLSearchParams(window.location.search).get("next") || "/" + result.user.role;
+      router.push(next.startsWith("/") && !next.startsWith("//") ? next : "/" + result.user.role); router.refresh();
+    } catch (e) { setError(e instanceof Error ? e.message : "Login failed."); }
+    finally { setLoading(false); }
+  }
+  return <main className="flex min-h-[75vh] items-center justify-center px-4 py-12"><Card className="w-full max-w-md space-y-5 p-7 shadow-soft">
+    <div><p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">LearnHub</p><h1 className="mt-2 text-3xl font-black">Log in</h1><p className="mt-2 text-sm text-muted-foreground">Sign in with your email and password.</p></div>
+    <form className="space-y-4" onSubmit={submit}>
+      <label className="block space-y-2 text-sm font-medium">Email<Input type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} /></label>
+      <label className="block space-y-2 text-sm font-medium">Password<Input type="password" autoComplete="current-password" required minLength={8} value={password} onChange={e => setPassword(e.target.value)} /></label>
+      {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+      <Button className="w-full" type="submit" disabled={loading}>{loading ? "Signing in..." : "Log in"}</Button>
+    </form>
+    <p className="text-center text-sm text-muted-foreground">New to LearnHub? <Link className="font-semibold text-primary" href="/register">Create an account</Link></p>
+    <p className="text-center text-sm text-muted-foreground">Administrator? <Link className="font-semibold text-primary" href="/admin/login">Admin login</Link></p>
+  </Card></main>;
 }
