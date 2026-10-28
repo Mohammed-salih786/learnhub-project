@@ -9,6 +9,7 @@ export function CourseCard({
   learners,
   price,
   isPremium,
+  image,
   href
 }: {
   title: string;
@@ -17,11 +18,12 @@ export function CourseCard({
   learners: number;
   price: string;
   isPremium?: boolean;
+  image: string;
   href: string;
 }) {
   return (
     <Card className="overflow-hidden p-0">
-      <div className="h-32 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent" />
+      <img src={image} alt="" className="h-32 w-full object-cover" />
       <div className="p-5">
         <div className="mb-3 flex items-center justify-between gap-3">
           <Badge variant="secondary">{category}</Badge>

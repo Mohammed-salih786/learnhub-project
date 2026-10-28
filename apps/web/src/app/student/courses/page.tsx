@@ -12,6 +12,7 @@ const catalog = [
     learners: 248,
     price: "₹299/mo",
     isPremium: true,
+    image: "/course-images/minimal-3d-ui-design-workspace.png",
     href: "/student/courses/product-design-foundations"
   },
   {
@@ -21,6 +22,7 @@ const catalog = [
     learners: 186,
     price: "₹499/mo",
     isPremium: true,
+    image: "/course-images/pastel-product-research-dashboard.png",
     href: "/student/courses/research-ops-for-product-teams"
   },
   {
@@ -30,6 +32,7 @@ const catalog = [
     learners: 412,
     price: "Free preview",
     isPremium: false,
+    image: "/course-images/ai-prompting-productivity-workspace.png",
     href: "/student/courses/prompt-engineering-for-daily-work"
   }
 ];

@@ -3,7 +3,15 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PublicShell } from "@/components/layout/public-shell";
 
+const lessonVideos: Record<string, string> = {
+  "product-design-foundations": "LckQ4VVjHDs",
+  "research-ops-for-product-teams": "ODpB9-MCa5s",
+  "prompt-engineering-for-daily-work": "GifUqgksJWc"
+};
+
 export default function StudentLessonPage({ params }: { params: { id: string } }) {
+  const videoId = lessonVideos[params.id];
+
   return (
     <PublicShell>
       <main className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
@@ -23,8 +31,20 @@ export default function StudentLessonPage({ params }: { params: { id: string } }
         </div>
 
         <Card className="overflow-hidden">
-          <div className="flex aspect-video items-center justify-center bg-gradient-to-br from-primary/20 via-primary/10 to-background text-xl font-bold text-foreground">
-            Lesson preview player
+          <div className="aspect-video bg-black">
+            {videoId ? (
+              <iframe
+                className="h-full w-full"
+                src={`https://www.youtube.com/embed/${videoId}`}
+                title={`${params.id.replace(/-/g, " ")} lesson video`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary/20 via-primary/10 to-background text-xl font-bold text-foreground">
+                Lesson preview player
+              </div>
+            )}
           </div>
           <div className="p-6">
             <div className="mb-5 flex items-center justify-between">
