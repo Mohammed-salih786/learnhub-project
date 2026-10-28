@@ -14,17 +14,17 @@ export default function StudentLessonPage({ params }: { params: { id: string } }
 
   return (
     <PublicShell>
-      <main className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Lesson</p>
-            <h1 className="mt-2 text-3xl font-black">{params.id.replace(/-/g, " ")}</h1>
+            <h1 className="mt-2 text-2xl font-black capitalize sm:text-3xl">{params.id.replace(/-/g, " ")}</h1>
           </div>
-          <div className="flex gap-2">
-            <a href="/student/courses" className={buttonVariants({ variant: "outline" })}>
+          <div className="flex w-full flex-col gap-2 sm:flex-row md:w-auto">
+            <a href="/student/courses" className={`${buttonVariants({ variant: "outline" })} w-full sm:w-auto`}>
               Course catalog
             </a>
-            <a href="/student" className={buttonVariants({ variant: "default" })}>
+            <a href="/student" className={`${buttonVariants({ variant: "default" })} w-full sm:w-auto`}>
               Continue learning
             </a>
           </div>
@@ -55,7 +55,7 @@ export default function StudentLessonPage({ params }: { params: { id: string } }
               <Badge>12 min</Badge>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-3">
               <Card className="p-4">
                 <p className="text-sm text-muted-foreground">Progress</p>
                 <p className="mt-2 text-2xl font-black">68%</p>

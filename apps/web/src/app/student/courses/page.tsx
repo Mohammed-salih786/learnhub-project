@@ -40,23 +40,23 @@ const catalog = [
 export default function StudentCatalogPage() {
   return (
     <PublicShell>
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Learning library</p>
-            <h1 className="mt-2 text-3xl font-black">Discover your next skill</h1>
+            <h1 className="mt-2 text-2xl font-black sm:text-3xl">Discover your next skill</h1>
           </div>
-          <div className="flex gap-2">
-            <a href="/student" className={buttonVariants({ variant: "outline" })}>
+          <div className="flex w-full flex-col gap-2 sm:flex-row md:w-auto">
+            <a href="/student" className={`${buttonVariants({ variant: "outline" })} w-full sm:w-auto`}>
               Dashboard
             </a>
-            <a href="/student/checkout" className={buttonVariants({ variant: "default" })}>
+            <a href="/student/checkout" className={`${buttonVariants({ variant: "default" })} w-full sm:w-auto`}>
               View plans
             </a>
           </div>
         </div>
 
-        <div className="mb-8 grid gap-4 md:grid-cols-4">
+        <div className="mb-8 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
           <Card className="p-4">
             <p className="text-sm text-muted-foreground">Ongoing</p>
             <p className="mt-2 text-2xl font-black">12</p>
@@ -75,7 +75,7 @@ export default function StudentCatalogPage() {
           </Card>
         </div>
 
-        <div className="mb-6 flex items-center gap-2">
+        <div className="mb-6 flex flex-col items-start gap-2 sm:flex-row sm:items-center">
           <Badge variant="secondary">Featured</Badge>
           <span className="text-sm text-muted-foreground">Built for working professionals and career switchers.</span>
         </div>

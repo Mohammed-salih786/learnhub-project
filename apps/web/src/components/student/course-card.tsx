@@ -23,15 +23,15 @@ export function CourseCard({
 }) {
   return (
     <Card className="overflow-hidden p-0">
-      <img src={image} alt="" className="h-32 w-full object-cover" />
-      <div className="p-5">
-        <div className="mb-3 flex items-center justify-between gap-3">
+      <img src={image} alt="" className="h-40 w-full object-cover sm:h-32" />
+      <div className="p-4 sm:p-5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <Badge variant="secondary">{category}</Badge>
           {isPremium ? <Badge>Premium</Badge> : <Badge variant="outline">Free preview</Badge>}
         </div>
-        <h3 className="text-xl font-bold">{title}</h3>
+        <h3 className="text-lg font-bold sm:text-xl">{title}</h3>
         <p className="mt-2 text-sm text-muted-foreground">Level: {level}</p>
-        <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+        <div className="mt-4 flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:gap-0">
           <span>{learners} learners</span>
           <span className="font-semibold text-foreground">{price}</span>
         </div>
