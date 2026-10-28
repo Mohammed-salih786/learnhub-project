@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -23,7 +24,7 @@ export function CourseCard({
 }) {
   return (
     <Card className="overflow-hidden p-0">
-      <img src={image} alt="" className="h-40 w-full object-cover sm:h-32" />
+      <Image src={image} alt="" width={800} height={450} className="h-40 w-full object-cover sm:h-32" />
       <div className="p-4 sm:p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <Badge variant="secondary">{category}</Badge>
