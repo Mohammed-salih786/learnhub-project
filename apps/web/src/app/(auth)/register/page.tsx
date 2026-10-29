@@ -40,5 +40,6 @@ export default function RegisterPage() {
     </form>
     <p className="text-center text-sm text-muted-foreground">Already registered? <Link className="font-semibold text-primary" href="/login">Log in</Link></p>
     <p className="text-center text-sm text-muted-foreground">Administrator? <Link className="font-semibold text-primary" href="/admin/register">Admin registration</Link></p>
+    <p className="text-center text-xs text-muted-foreground">By registering, you agree to our <Link className="underline" href="/terms">Terms</Link> and <Link className="underline" href="/privacy">Privacy Policy</Link>.</p>
   </Card></main>;
 }

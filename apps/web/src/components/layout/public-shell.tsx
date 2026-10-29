@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LogoutButton } from "@/components/layout/logout-button";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 
 const navLinks = [
   { href: "/student/courses", label: "Courses" },
@@ -46,6 +47,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
 
           {/* Desktop CTAs */}
           <div className="hidden items-center gap-2 md:flex">
+            <ThemeSwitcher />
             {isAuthenticatedArea ? (
               <LogoutButton />
             ) : (

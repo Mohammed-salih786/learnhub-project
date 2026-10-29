@@ -15,8 +15,9 @@ export default function HomePage() {
   return (
     <PublicShell>
       <main className="mx-auto max-w-6xl px-4 pb-20 pt-10 sm:px-6">
-        <section className="grid gap-10 md:grid-cols-[1.2fr_0.8fr] md:items-center">
-          <div>
+        <section className="relative grid gap-10 overflow-hidden rounded-3xl bg-gradient-primary bg-[length:200%_200%] p-6 animate-gradient-shift md:grid-cols-[1.2fr_0.8fr] md:items-center md:p-10">
+          <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-cyan-300/20 blur-3xl animate-glow-pulse" />
+          <div className="relative animate-float">
             <Badge className="mb-4">India-first learning marketplace</Badge>
             <h1 className="max-w-xl text-4xl font-black tracking-tight sm:text-5xl">
               Learn smarter with a subscription that never limits growth.
@@ -39,7 +40,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <Card className="p-6 shadow-soft">
+          <Card className="glass relative p-6 shadow-soft transition-transform hover:-translate-y-1">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-muted-foreground">Growth snapshot</p>
               <Badge>Live</Badge>
@@ -57,6 +58,10 @@ export default function HomePage() {
             </div>
           </Card>
         </section>
+
+        <div className="mt-8 overflow-hidden rounded-xl border border-border bg-card/60 py-3">
+          <div className="flex w-max gap-8 whitespace-nowrap text-sm text-muted-foreground animate-marquee">{["Loved by 15k+ learners", "Practical courses for real work", "Built for India-first growth", "Loved by 15k+ learners", "Practical courses for real work"].map((item, index) => <span key={`${item}-${index}`} className="px-3">✦ {item}</span>)}</div>
+        </div>
 
         <section className="mt-16">
           <div className="mb-6 flex items-center justify-between">

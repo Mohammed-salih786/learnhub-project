@@ -7,6 +7,7 @@ import { BookOpen, Home, Search, Trophy, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LogoutButton } from "@/components/layout/logout-button";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 
 const navItems = [
   { href: "/student", label: "Home", icon: Home },
@@ -32,7 +33,7 @@ export function StudentShell({ children }: { children: React.ReactNode }) {
           <Link href="/student/notifications" className="relative p-2 text-muted-foreground hover:text-foreground">
             <BookOpen className="h-5 w-5" />
           </Link>
-          <LogoutButton />
+          <div className="flex items-center gap-2"><ThemeSwitcher /><LogoutButton /></div>
         </div>
       </header>
 
@@ -64,6 +65,7 @@ export function StudentShell({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
           <div className="px-3 pt-4">
+            <ThemeSwitcher />
             <LogoutButton className="w-full justify-start" />
           </div>
         </aside>

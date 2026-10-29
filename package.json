@@ -1,6 +1,9 @@
 {
   "name": "learnhub",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "packageManager": "pnpm@9.15.0",
   "workspaces": [
     "apps/*",

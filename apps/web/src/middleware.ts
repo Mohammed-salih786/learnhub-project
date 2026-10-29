@@ -8,6 +8,11 @@ const roleHome = {
 
 export function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+
+  if (process.env.NODE_ENV === "production" && pathname.startsWith("/design")) {
+    return NextResponse.rewrite(new URL("/_not-found", request.url));
+  }
+
   const portal = pathname.startsWith("/admin")
     ? "admin"
     : pathname.startsWith("/instructor")
@@ -34,5 +39,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/student/:path*", "/instructor/:path*", "/admin/:path*"]
+  matcher: ["/design/:path*", "/student/:path*", "/instructor/:path*", "/admin/:path*"]
 };

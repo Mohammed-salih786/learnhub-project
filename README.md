@@ -10,7 +10,7 @@ The frontend rewrites `/api/*` requests to Flask. Flask handles authentication, 
 ## Requirements
 
 - Node.js 20 or newer and pnpm 9.15.0
-- Python 3.11 or newer
+- Python 3.12 or newer
 - A MongoDB Atlas cluster and database user
 
 ## Configure MongoDB Atlas
@@ -62,6 +62,17 @@ This repository needs two Vercel projects connected to the same GitHub repositor
 4. Create another Vercel project from the same GitHub repository and set **Root Directory** to `apps/web`. Enable **Include source files outside of the Root Directory** so the `packages/shared` workspace package is available. Set `FLASK_API_URL` to the API URL from step 3, with no trailing slash, before deploying.
 5. Set the API project's `CORS_ORIGINS` to the final frontend origin and redeploy if it changed. Configure MongoDB Atlas Network Access for the backend's outbound IP addresses. Vercel uses dynamic outbound IPs by default; if Atlas requires a fixed allow-list, use Vercel Static IPs or host the API on a service with static egress.
 
+### Vercel deployment gotchas
+
+- Configure the web project with Root Directory `apps/web` and enable access to source files outside that directory for `packages/shared`.
+- Configure the API project with Root Directory `backend` and turn Deployment Protection off for the API project when the web rewrite must reach it without an interactive Vercel login.
+- For a simple Atlas setup, allow `0.0.0.0/0` in Atlas Network Access and protect the database with a strong user password and least-privilege database user. Restrict this later if your hosting egress is fixed.
+- Set `FLASK_API_URL` in both Vercel Production and Preview environments; use the corresponding backend URL for each environment.
+- Run `backend/seed.py` once against the target database before testing authenticated catalog pages.
+- Set `NEXT_PUBLIC_SITE_URL` to the public web origin for metadata and robots output.
+
 Set secrets in Vercel's Environment Variables; never commit `.env`. Redeploy after changing environment variables. Vercel runs Flask as a Python Function, not as a long-running Gunicorn server.
 
 Razorpay checkout and durable video/file storage require their provider credentials and further integration before production use. Vercel Functions limit request bodies to 4.5 MB; large media must upload directly to an object-storage provider instead of passing through the Flask function.
+
+For uploads, use `STORAGE_PROVIDER=local` only during local development. Vercel deployments must use an S3-compatible provider by setting `STORAGE_PROVIDER=s3`, `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, and `S3_PUBLIC_BASE_URL` (plus `S3_ENDPOINT_URL` for non-AWS providers).

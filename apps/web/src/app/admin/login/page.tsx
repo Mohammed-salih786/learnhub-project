@@ -24,7 +24,9 @@ export default function AdminLoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, expectedRole: "admin" })
       });
-      const result = await response.json();
+      const contentType = response.headers.get("content-type") || "";
+      const result = contentType.includes("application/json") ? await response.json() : null;
+      if (!result) throw new Error("LearnHub API is unavailable. Start Flask on http://127.0.0.1:5000 and verify MongoDB settings.");
       if (!response.ok || !result.ok) throw new Error(result.error || "Admin login failed.");
       const next = new URLSearchParams(window.location.search).get("next") || "/admin";
       router.replace(next.startsWith("/") && !next.startsWith("//") ? next : "/admin");

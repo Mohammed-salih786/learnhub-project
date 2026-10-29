@@ -7,6 +7,7 @@ import { BarChart2, BookOpen, Home, PlusCircle, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LogoutButton } from "@/components/layout/logout-button";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 
 const navItems = [
   { href: "/instructor", label: "Dashboard", icon: Home },
@@ -31,7 +32,7 @@ export function InstructorShell({ children }: { children: React.ReactNode }) {
           <Link href="/instructor/courses/new" className="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground">
             + New
           </Link>
-          <LogoutButton />
+          <div className="flex items-center gap-2"><ThemeSwitcher /><LogoutButton /></div>
         </div>
       </header>
 
@@ -60,6 +61,7 @@ export function InstructorShell({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
           <div className="px-3 pt-4">
+            <ThemeSwitcher />
             <LogoutButton className="w-full justify-start" />
           </div>
         </aside>

@@ -10,6 +10,10 @@ from pathlib import Path
 import jwt
 from bson import ObjectId
 from dotenv import load_dotenv
+try:
+    import boto3
+except ImportError:
+    boto3 = None
 from flask import Flask, jsonify, request, g, redirect, send_from_directory
 from flask_cors import CORS
 from pymongo import ASCENDING, MongoClient
@@ -410,6 +414,22 @@ def create_lesson_resource(lesson_id):
 def upload():
     if "file" not in request.files: return fail("Select a file to upload.")
     file = request.files["file"]; filename = f"{uid()}-{Path(file.filename or 'upload').name}"
+    provider = os.getenv("STORAGE_PROVIDER", "local").lower()
+    if provider == "s3":
+        if boto3 is None: return fail("S3 storage dependencies are not installed.", 503)
+        bucket = os.getenv("S3_BUCKET")
+        if not bucket: return fail("S3_BUCKET is required for durable uploads.", 503)
+        client = boto3.client(
+            "s3",
+            endpoint_url=os.getenv("S3_ENDPOINT_URL") or None,
+            region_name=os.getenv("S3_REGION") or None,
+            aws_access_key_id=os.getenv("S3_ACCESS_KEY_ID") or None,
+            aws_secret_access_key=os.getenv("S3_SECRET_ACCESS_KEY") or None,
+        )
+        client.upload_fileobj(file, bucket, filename, ExtraArgs={"ContentType": file.mimetype or "application/octet-stream"})
+        base_url = os.getenv("S3_PUBLIC_BASE_URL", "").rstrip("/")
+        return jsonify({"ok": True, "url": f"{base_url}/{filename}" if base_url else f"s3://{bucket}/{filename}", "filename": filename})
+    if os.getenv("VERCEL") == "1": return fail("Configure STORAGE_PROVIDER=s3 for durable Vercel uploads.", 503)
     target = Path(os.getenv("UPLOAD_FOLDER", "uploads")); target.mkdir(parents=True, exist_ok=True); file.save(target / filename)
     return jsonify({"ok": True, "url": f"/uploads/{filename}", "filename": filename})
 

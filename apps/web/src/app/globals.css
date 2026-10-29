@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --background: 0 0% 100%;
+  --background: 0 0% 99%;
   --foreground: 222 47% 11%;
   --card: 0 0% 100%;
   --card-foreground: 222 47% 11%;
   --popover: 0 0% 100%;
   --popover-foreground: 222 47% 11%;
-  --primary: 224 76% 48%;
+  --primary: 243 75% 59%;
   --primary-foreground: 0 0% 100%;
   --secondary: 210 40% 96%;
   --secondary-foreground: 222 47% 11%;
@@ -25,14 +25,14 @@
   --radius: 1rem;
 }
 
-.dark {
+[data-theme="dark"] {
   --background: 224 47% 8%;
   --foreground: 210 40% 98%;
   --card: 224 38% 12%;
   --card-foreground: 210 40% 98%;
   --popover: 224 38% 12%;
   --popover-foreground: 210 40% 98%;
-  --primary: 220 90% 62%;
+  --primary: 262 83% 66%;
   --primary-foreground: 210 40% 98%;
   --secondary: 217 33% 17%;
   --secondary-foreground: 210 40% 98%;
@@ -46,6 +46,24 @@
   --input: 217 33% 18%;
   --ring: 220 90% 62%;
 }
+
+[data-theme="mint"] {
+  --background: 150 20% 98%; --foreground: 160 35% 12%; --card: 0 0% 100%; --card-foreground: 160 35% 12%; --popover: 0 0% 100%; --popover-foreground: 160 35% 12%; --primary: 160 84% 39%; --primary-foreground: 0 0% 100%; --secondary: 152 36% 91%; --secondary-foreground: 160 35% 12%; --muted: 150 22% 93%; --muted-foreground: 160 15% 38%; --accent: 172 66% 43%; --accent-foreground: 0 0% 100%; --destructive: 0 72% 51%; --destructive-foreground: 0 0% 100%; --border: 150 20% 86%; --input: 150 20% 86%; --ring: 160 84% 39%; --radius: 1rem;
+}
+[data-theme="sunset"] {
+  --background: 30 40% 98%; --foreground: 20 35% 12%; --card: 0 0% 100%; --card-foreground: 20 35% 12%; --popover: 0 0% 100%; --popover-foreground: 20 35% 12%; --primary: 18 90% 42%; --primary-foreground: 0 0% 100%; --secondary: 30 60% 91%; --secondary-foreground: 20 35% 12%; --muted: 30 35% 93%; --muted-foreground: 20 18% 38%; --accent: 42 90% 48%; --accent-foreground: 20 35% 12%; --destructive: 0 72% 45%; --destructive-foreground: 0 0% 100%; --border: 30 25% 86%; --input: 30 25% 86%; --ring: 18 90% 42%; --radius: 1rem;
+}
+[data-theme="glass"] {
+  --background: 222 30% 6%; --foreground: 210 40% 98%; --card: 222 25% 12%; --card-foreground: 210 40% 98%; --popover: 222 25% 12%; --popover-foreground: 210 40% 98%; --primary: 199 89% 56%; --primary-foreground: 222 30% 6%; --secondary: 220 25% 18%; --secondary-foreground: 210 40% 98%; --muted: 220 22% 16%; --muted-foreground: 215 20% 74%; --accent: 186 82% 52%; --accent-foreground: 222 30% 6%; --destructive: 0 72% 55%; --destructive-foreground: 0 0% 100%; --border: 210 30% 24%; --input: 210 30% 24%; --ring: 199 89% 56%; --radius: 1rem;
+}
+[data-theme="pastel"] {
+  --background: 280 40% 98%; --foreground: 270 35% 18%; --card: 0 0% 100%; --card-foreground: 270 35% 18%; --popover: 0 0% 100%; --popover-foreground: 270 35% 18%; --primary: 270 70% 45%; --primary-foreground: 0 0% 100%; --secondary: 270 45% 93%; --secondary-foreground: 270 35% 18%; --muted: 280 30% 94%; --muted-foreground: 270 18% 40%; --accent: 320 70% 58%; --accent-foreground: 0 0% 100%; --destructive: 0 72% 50%; --destructive-foreground: 0 0% 100%; --border: 270 25% 88%; --input: 270 25% 88%; --ring: 270 70% 45%; --radius: 1rem;
+}
+
+[data-theme="glass"] .glass { @apply border-white/10 bg-card/40 backdrop-blur-xl; }
+.bg-gradient-primary { background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent))); }
+body, .bg-background, .text-foreground { transition: background-color 220ms ease, color 220ms ease; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 220ms; }
 
 * {
   box-sizing: border-box;
@@ -74,4 +92,8 @@ body {
   a {
     @apply transition-colors;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
 }

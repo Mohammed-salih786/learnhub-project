@@ -23,7 +23,7 @@ export function CourseCard({
   href: string;
 }) {
   return (
-    <Card className="overflow-hidden p-0">
+    <Card className="overflow-hidden p-0 transition-transform hover:-translate-y-1 hover:shadow-soft">
       <Image src={image} alt="" width={800} height={450} className="h-40 w-full object-cover sm:h-32" />
       <div className="p-4 sm:p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
