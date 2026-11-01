@@ -16,6 +16,10 @@
 
 ## Integrations
 - [ ] Razorpay keys and webhook secret are configured and validated before accepting payments.
+- [ ] Monthly/yearly plan prices are configured in paise and test-mode checkout, webhook retries, billing cancellation, and refund are verified.
+- [ ] Razorpay production webhook uses the production frontend proxy URL and subscribes to captured/failed payment, paid order, subscription, and refund events.
+- [ ] Razorpay key secret and webhook secret are set only in Flask hosting; only the key ID is sent to the browser.
+- [ ] Admin payout references are reconciled with actual bank transfers; LearnHub payout marking does not transfer funds.
 - [ ] Email and video/file services are configured if enabled.
 - [ ] Monitoring and uptime alerts cover Flask, the frontend, and Atlas.
 

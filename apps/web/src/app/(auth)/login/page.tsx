@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -19,7 +19,10 @@ export default function LoginPage() {
       const contentType = response.headers.get("content-type") || "";
       const result = contentType.includes("application/json") ? await response.json() : null;
       if (!result) throw new Error("LearnHub API is unavailable. Start Flask on http://127.0.0.1:5000 and verify MongoDB settings.");
-      if (!response.ok || !result.ok) throw new Error(result.error || "Login failed.");
+      if (!response.ok || !result.ok) {
+        if (response.status === 429) { const seconds = Math.max(1, Number(result.retry_after) || 900); throw new Error(`Too many login attempts. Please wait ${seconds} seconds before trying again.`); }
+        throw new Error(result.error || "Login failed.");
+      }
       const next = new URLSearchParams(window.location.search).get("next") || "/" + result.user.role;
       router.push(next.startsWith("/") && !next.startsWith("//") ? next : "/" + result.user.role); router.refresh();
     } catch (e) { setError(e instanceof Error ? e.message : "Login failed."); }

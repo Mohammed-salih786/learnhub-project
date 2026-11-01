@@ -9,10 +9,15 @@ const learningTracks = [
   { title: "Research sprint playbooks", progress: 81, lessons: "9 of 12 lessons" }
 ];
 
-export default function StudentPage() {
+export default function StudentPage({ searchParams }: { searchParams: { payment?: string } }) {
   return (
     <StudentShell>
       <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+        {searchParams.payment === "success" ? (
+          <p role="status" className="mb-6 rounded-lg border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm">
+            Payment successful. Your subscription is active.
+          </p>
+        ) : null}
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Student dashboard</p>
@@ -77,6 +82,9 @@ export default function StudentPage() {
               </a>
               <a href="/student/checkout" className={`${buttonVariants({ variant: "outline" })} w-full`}>
                 Review plans
+              </a>
+              <a href="/student/billing" className={`${buttonVariants({ variant: "outline" })} w-full`}>
+                Billing and payments
               </a>
             </div>
           </Card>

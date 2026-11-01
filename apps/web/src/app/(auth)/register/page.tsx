@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -34,7 +34,7 @@ export default function RegisterPage() {
       <label className="block space-y-2 text-sm font-medium">Full name<Input autoComplete="name" required minLength={2} maxLength={120} value={fullName} onChange={e => setFullName(e.target.value)} /></label>
       <label className="block space-y-2 text-sm font-medium">Email<Input type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} /></label>
       <label className="block space-y-2 text-sm font-medium">Password<Input type="password" autoComplete="new-password" required minLength={8} value={password} onChange={e => setPassword(e.target.value)} /><span className="block text-xs font-normal text-muted-foreground">Use at least 8 characters.</span></label>
-      <label className="block space-y-2 text-sm font-medium">Account type<select className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm" value={role} onChange={e => setRole(e.target.value as "student" | "instructor")}><option value="student">Student</option><option value="instructor">Instructor</option></select></label>
+      <label className="block space-y-2 text-sm font-medium">Account type<select className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm" value={role} onChange={e => setRole(e.target.value as "student" | "instructor")}><option value="student">Student</option><option value="instructor">Instructor</option></select></label>{role === "instructor" && <p className="-mt-4 text-sm text-muted-foreground">Instructor access needs admin approval.</p>}
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}{message && <p role="status" className="text-sm text-primary">{message}</p>}
       <Button className="w-full" type="submit" disabled={loading}>{loading ? "Creating account..." : "Register"}</Button>
     </form>

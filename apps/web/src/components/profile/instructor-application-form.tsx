@@ -1,0 +1,10 @@
+"use client";
+import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+export function InstructorApplicationForm() {
+  const [bio,setBio]=React.useState(""); const [headline,setHeadline]=React.useState(""); const [busy,setBusy]=React.useState(false); const [error,setError]=React.useState(""); const [notice,setNotice]=React.useState("");
+  async function submit(event:React.FormEvent<HTMLFormElement>) { event.preventDefault(); setBusy(true); setError(""); setNotice(""); try { const response=await fetch("/api/auth/instructor-request",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bio,headline})}); const result=await response.json(); if(!response.ok) throw new Error(result.error||"Could not submit application."); setNotice("Instructor application submitted for admin approval."); setBio(""); setHeadline(""); } catch(caught) { setError(caught instanceof Error?caught.message:"Could not submit application."); } finally { setBusy(false); } }
+  return <Card className="mt-6 space-y-4 p-6"><h2 className="text-lg font-bold">Become an instructor</h2><p className="text-sm text-muted-foreground">Instructor access needs admin approval.</p><form className="space-y-3" onSubmit={submit}><label className="block space-y-1 text-sm">Headline<Input required minLength={3} maxLength={120} value={headline} onChange={(event)=>setHeadline(event.target.value)}/></label><label className="block space-y-1 text-sm">Bio<textarea required minLength={10} maxLength={1000} value={bio} onChange={(event)=>setBio(event.target.value)} className="min-h-24 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"/></label><Button disabled={busy}>{busy?"Submitting...":"Submit application"}</Button></form>{error&&<p role="alert" className="text-sm text-destructive">{error}</p>}{notice&&<p role="status" className="text-sm text-emerald-600">{notice}</p>}</Card>;
+}

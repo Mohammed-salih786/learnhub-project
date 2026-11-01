@@ -17,17 +17,21 @@ const moderationQueue = [
   { course: "Career Sprint Bootcamp", reviewer: "Mira Patel", reason: "Support links missing from learner onboarding", severity: "low" }
 ];
 
-const payoutQueue = [
-  { instructor: "Maya Singh", amount: "₹24,500", status: "Pending" },
-  { instructor: "Arjun Verma", amount: "₹18,200", status: "Scheduled" },
-  { instructor: "Nisha Rao", amount: "₹12,750", status: "Processing" }
-];
-
 const analyticsData = [
   { label: "Trial-to-paid conversion", value: "4.8%" },
   { label: "Monthly churn", value: "2.1%" },
   { label: "Course completion", value: "78%" },
   { label: "Support backlog", value: "34 tickets" }
+];
+
+const adminSections = [
+  { href: "/admin/users", label: "Users" },
+  { href: "/admin/instructors", label: "Instructor verification" },
+  { href: "/admin/categories", label: "Categories" },
+  { href: "/admin/payments", label: "Payments" },
+  { href: "/admin/payouts", label: "Payouts" },
+  { href: "/admin/moderation", label: "Moderation queue" },
+  { href: "/admin/audit-logs", label: "Audit log" }
 ];
 
 export default function AdminPage() {
@@ -40,6 +44,9 @@ export default function AdminPage() {
             <h1 className="mt-2 text-3xl font-black">Marketplace control room</h1>
           </div>
           <div className="flex gap-2">
+            <a href="/admin/courses" className={buttonVariants({ variant: "outline" })}>
+              Course approvals
+            </a>
             <a href="/admin" className={buttonVariants({ variant: "outline" })}>
               Review reports
             </a>
@@ -58,6 +65,14 @@ export default function AdminPage() {
             </Card>
           ))}
         </div>
+
+        <nav aria-label="Admin tools" className="mt-6 flex flex-wrap gap-2">
+          {adminSections.map((section) => (
+            <a key={section.href} href={section.href} className={buttonVariants({ variant: "outline", size: "sm" })}>
+              {section.label}
+            </a>
+          ))}
+        </nav>
 
         <Tabs defaultValue="overview" className="mt-10">
           <TabsList className="mb-6 w-full justify-start overflow-x-auto">
@@ -127,23 +142,9 @@ export default function AdminPage() {
 
           <TabsContent value="payouts">
             <Card className="p-6">
-              <div className="mb-5 flex items-center justify-between">
-                <h2 className="text-xl font-bold">Payout tracker</h2>
-                <Badge variant="secondary">₹97,450 pending</Badge>
-              </div>
-
-              <div className="space-y-4">
-                {payoutQueue.map((payout) => (
-                  <div key={payout.instructor} className="flex flex-col gap-3 rounded-xl border border-border bg-muted/40 p-4 md:flex-row md:items-center md:justify-between">
-                    <div>
-                      <p className="font-semibold">{payout.instructor}</p>
-                      <p className="text-sm text-muted-foreground">Settlements and manual review</p>
-                    </div>
-                    <p className="text-lg font-black">{payout.amount}</p>
-                    <Badge variant={payout.status === "Pending" ? "default" : payout.status === "Scheduled" ? "secondary" : "outline"}>{payout.status}</Badge>
-                  </div>
-                ))}
-              </div>
+              <h2 className="mb-3 text-xl font-bold">Payout tracker</h2>
+              <p className="mb-5 text-sm text-muted-foreground">Review accrued instructor earnings and record transfer references.</p>
+              <a href="/admin/payouts" className={buttonVariants({ variant: "default" })}>Open payout management</a>
             </Card>
           </TabsContent>
 
