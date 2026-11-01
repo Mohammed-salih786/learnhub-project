@@ -2052,5 +2052,9 @@ def server_error(error):
     app.logger.exception("Unhandled LearnHub API error", exc_info=cause or error)
     return fail("The server could not complete the request. Check the Flask terminal for details.", 500)
 
+@app.route('/')
+def home():
+    return "LearnHub Backend is Running!"
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", "5000")), debug=os.getenv("FLASK_DEBUG", "false").lower() == "true")
