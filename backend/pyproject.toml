@@ -8,5 +8,6 @@ dependencies = [
   "pymongo==4.15.3",
   "PyJWT==2.10.1",
   "python-dotenv==1.1.1",
+  "razorpay==1.4.2",
   "boto3==1.35.99",
 ]
