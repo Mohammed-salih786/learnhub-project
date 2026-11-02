@@ -76,3 +76,6 @@ Set secrets in Vercel's Environment Variables; never commit `.env`. Redeploy aft
 Razorpay checkout and durable video/file storage require their provider credentials and further integration before production use. Vercel Functions limit request bodies to 4.5 MB; large media must upload directly to an object-storage provider instead of passing through the Flask function.
 
 For uploads, use `STORAGE_PROVIDER=local` only during local development. Vercel deployments must use an S3-compatible provider by setting `STORAGE_PROVIDER=s3`, `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, and `S3_PUBLIC_BASE_URL` (plus `S3_ENDPOINT_URL` for non-AWS providers).
+
+
+For the shortest setup, follow [Simple Vercel Deployment](docs/deploy-vercel-simple.md).
