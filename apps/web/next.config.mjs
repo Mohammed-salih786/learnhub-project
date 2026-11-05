@@ -6,7 +6,10 @@ const nextConfig = {
       throw new Error("Set FLASK_API_URL in the Vercel project environment before deploying the web app.");
     }
     const backend = configuredBackend || "http://127.0.0.1:5000";
-    return [{ source: "/api/:path*", destination: `${backend}/api/learnhub/:path*` }];
+    return [
+      { source: "/api/learnhub/:path*", destination: `${backend}/api/learnhub/:path*` },
+      { source: "/api/:path*", destination: `${backend}/api/learnhub/:path*` }
+    ];
   },
   images: {
     remotePatterns: [

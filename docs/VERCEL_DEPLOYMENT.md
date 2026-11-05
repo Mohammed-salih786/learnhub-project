@@ -39,5 +39,7 @@ corepack pnpm --dir apps/web build
 python -m py_compile backend/app.py
 ```
 
-After deployment, verify the backend health endpoint, login, registration,
-course images, YouTube lesson embeds, and mobile layouts.
+After deployment, verify the health endpoint at both
+`https://<web-app>.vercel.app/api/health` and
+`https://<web-app>.vercel.app/api/learnhub/health`, along with login,
+registration, course images, YouTube lesson embeds, and mobile layouts.
